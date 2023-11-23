@@ -1,5 +1,7 @@
 from django.db import models
 
+class LastInstaWebPath(models.Model):
+    last_path = models.TextField(default=None)
 
 class Repository(models.Model):
     nome = models.TextField()

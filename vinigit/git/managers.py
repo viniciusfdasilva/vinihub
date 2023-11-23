@@ -1,14 +1,27 @@
 import os, environ
 from vinigit.settings import BASE_DIR
-from git.models import Repository
+from git.models import Repository, LastInstaWebPath
 
 def get_git_instaweb(repository_name):
     
     env = environ.Env()
     environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+    path = LastInstaWebPath.objects.all().first().last_path
+
+    if path:
+        
+        os.chdir(f'{env("GIT_PATH")}/{path}')
+        system_status = os.system(f'git instaweb --port {env("WEB_PORT")} --stop&')
+
+    os.chdir(f'{env("GIT_PATH")}/{repository_name}')
     
     chdir_status  = os.chdir(f'{env("GIT_PATH")}/{repository_name}')
-    system_status = os.system(f'{}')
+    system_status = os.system(f'git instaweb --port {env("WEB_PORT")} --start')
+    
+    last_path_model = LastInstaWebPath.objects.all().first()
+    last_path_model.last_path = repository_name
+    last_path_model.save()
     
     if chdir_status == 0 and system_status == 0:
         return True
