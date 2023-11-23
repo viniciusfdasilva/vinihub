@@ -18,8 +18,8 @@ from django.urls import path
 from git import views
 
 urlpatterns = [
-    path('', views.LoginView.as_view(), name='main'),
-    path('painel', views.PainelView.as_view(), name='painel'),
-    path('repo/<str:repository>', views.get_repo, name='repo'),
-    path('logout', views.LogoutView.as_view(), name='logout')
+    path(''                      , views.LoginView.as_view()   , name='main'  ),
+    path('painel'                , views.PainelView.as_view()  , name='painel'),
+    path('repo/<str:repository>/', views.get_repo              , name='repo'  ),
+    path('logout'                , views.LogoutView.as_view()  , name='logout')
 ]
