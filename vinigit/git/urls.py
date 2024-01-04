@@ -25,5 +25,6 @@ urlpatterns = [
     path('release/<str:repository>', views.ReleaseView.as_view(), name='release'),
     path('release/<str:repository>/<int:id_release>', views.ReleaseDetailView.as_view(), name='release_detail'),
     path('pull-request/<str:repository>/<int:id_pullrequest>', views.PullRequestDetailView.as_view(), name='pullrequest_detail'),
+    path('pull-request/<str:repository>/<int:id_pullrequest>/merge/', views.PullRequestDetailView.as_view(), name='pullrequest_detail'),
     path('pull-request/<str:repository>', views.PullRequestView.as_view(), name='pull_request')
 ]

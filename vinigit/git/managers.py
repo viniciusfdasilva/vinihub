@@ -16,8 +16,9 @@ class GitManager():
         return os_result.output.split('\n')
 
     def git_push(git_dir, branch):
+        
         os.chdir(f'{git_dir}') 
-        return os.system(f'git push origin {branch}')
+        return True if os.system(f'git push origin {branch}') == 0 else False
         
     def git_clone(rep_name, dst_clone):
         
