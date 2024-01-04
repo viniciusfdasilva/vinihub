@@ -122,6 +122,8 @@ class PullRequestView(ListView):
             to_branch   = request.POST.get('to_branch')
             description = request.POST.get('description')
             title       = request.POST.get('title')
+            
+            
 
             form = PullRequestForm()
             
@@ -129,14 +131,24 @@ class PullRequestView(ListView):
             
             if not is_merged_branch:
                 RepositoryManager.remove_dir(f'/tmp/{rep_name}')
+            
+            pull_request = PullRequest.objects.create(
+                    from_branch = from_branch     ,
+                    to_branch   = to_branch       ,
+                    description = description     ,
+                    title       = title           ,
+                    is_merged   = is_merged_branch,        
+            )
                 
+            created = True if pull_request else False
             pull_requests = PullRequest.objects.filter(repository=rep)
             
             context = {
                 'pull_requests': pull_requests,
                 'branches'     : GitManager.get_branches(rep_name),
                 'form'         : form,
-                'merged_branch': is_merged_branch
+                'merged_branch': is_merged_branch,
+                'created'      : created
             }
     
             return render(request, self.template_name, context=context)
