@@ -1,25 +1,39 @@
 import os, environ
 from vinigit.settings import BASE_DIR
+from git.utils import OS
 from git.models import Repository, LastInstaWebPath
 
 class GitManager():
     
+    def get_branches(rep_name):
+        
+        env = environ.Env()
+        environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+        
+        os.chdir(f'{env("GIT_PATH")}/{rep_name}.{env("REPO_EXTENTION")}/heads/')
+        os_result = OS._system('ls')
+        
+        return os_result.output.split('\n')
+
     def git_push(git_dir, branch):
         os.chdir(f'{git_dir}') 
         return os.system(f'git push origin {branch}')
         
-    def git_clone(git_url, dst_clone):
-        return os.system(f'git clone {git_url} {dst_clone}')
-    
-    def git_merge(git_url, from_branch, to_branch, message=None):
+    def git_clone(rep_name, dst_clone):
         
-        clone_result = GitManager.git_clone(git_url, '/tmp/')
+        env = environ.Env()
+        environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+        
+        return os.system(f'git clone {env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{env("rep_name")}.{env("REPO_EXTENTION")} {dst_clone}')
+    
+    def git_merge(rep_name, from_branch, to_branch):
+        
+        clone_result = GitManager.git_clone(rep_name, '/tmp/')
         
         if clone_result and clone_result == 0:
             
-            rep_name = git_url.split('/')[-1].replace('.git', '')
             os.chdir(f'/tmp/{rep_name}')        
-            return os.system(f'git merge {from_branch} {to_branch}')
+            return True if os.system(f'git merge {from_branch} {to_branch}') == 0 else False
         
     def get_git_instaweb(repository_name):
         

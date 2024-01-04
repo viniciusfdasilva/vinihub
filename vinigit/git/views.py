@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from git.managers import RepositoryManager, GitManager
-from git.forms import UserForm
+from git.forms import UserForm, PullRequestForm
 from git.models import Repository, PullRequest, Release
 
 class ReleaseDetailView(ListView):
@@ -22,7 +22,23 @@ class PullRequestDetailView(ListView):
     template_name = 'pullrequest_detail.html'
 
     def get(self, request, repository=None, id_pullrequest=None):
-        pass
+        
+        if repository and id_pullrequest:
+            
+            pull_request = PullRequest.objects.get(id=id_pullrequest)
+            
+            context = {
+                'title'      : pull_request.title,
+                'description': pull_request.description,
+                'is_merged'  : pull_request.is_merged,
+                'repository' : Repository.objects.get(id=pull_request.repository).name,
+                'to_branch'  : pull_request.to_branch,
+                'from_branch': pull_request.from_branch
+            }
+            
+            return render(request, self.template_name, context=context)
+        
+        
 class ReleaseView(ListView):
     
     template_name = 'releases.html'
@@ -48,13 +64,55 @@ class PullRequestView(ListView):
         if repository:
             
             rep = Repository.objects.get(name=repository)
+                        
+            if rep:
+            
+                rep_name = rep.name
+                pull_requests = PullRequest.objects.filter(repository=rep)
+                
+                form = PullRequestForm()
+                
+                context = {
+                    'pull_requests': pull_requests,
+                    'branches'     : GitManager.get_branches(rep_name),
+                    'form'         : form
+                }
+                return render(request, self.template_name, context=context)
+
+        return HttpResponse('Não encontrado!')
+
+    def post(self, request, repository=None):
+        
+        if repository:
+            
+            rep = Repository.objects.get(name=repository)
             
             if rep:
                 
-                pull_requests = PullRequest.objects.filter(repository=rep)
-                return render(request, self.template_name, {'pull_requests': pull_requests})
+                rep_name = rep.name
+                
+                from_branch = request.POST.get('from_branch')
+                to_branch   = request.POST.get('to_branch')
+                description = request.POST.get('description')
+                title       = request.POST.get('title')
 
-        return HttpResponse('Não encontrado!')
+                form = PullRequestForm()
+                
+                is_merged_branch = GitManager.git_merge(rep_name, from_branch, to_branch)
+                
+                if not is_merged_branch:
+                    RepositoryManager.remove_dir(f'/tmp/{rep_name}')
+                    
+                pull_requests = PullRequest.objects.filter(repository=rep)
+                
+                context = {
+                    'pull_requests': pull_requests,
+                    'branches'     : GitManager.get_branches(rep_name),
+                    'form'         : form,
+                    'merged_branch': is_merged_branch
+                }
+        
+                return render(request, self.template_name, context=context)
     
 class LogoutView(ListView):
     template_name = 'auth/login.html'
