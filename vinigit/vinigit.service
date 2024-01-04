@@ -3,7 +3,7 @@ Description=vinigit
 
 [Service]
 User=root
-ExecStart=python /app/vinigit/manage.py runserver 8002
+ExecStart=python /app/path/manage.py runserver 8002
 Restart=always
 
 [Install]

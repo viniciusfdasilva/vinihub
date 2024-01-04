@@ -7,10 +7,55 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib import messages
-from git.managers import RepositoryManager, get_git_instaweb
+from git.managers import RepositoryManager, GitManager
 from git.forms import UserForm
-from git.models import Repository
+from git.models import Repository, PullRequest, Release
 
+class ReleaseDetailView(ListView):
+    
+    template_name = 'release_detail.html'
+    
+    def get(self, request, repository=None, id_release=None):
+        pass
+    
+class PullRequestDetailView(ListView):
+    template_name = 'pullrequest_detail.html'
+
+    def get(self, request, repository=None, id_pullrequest=None):
+        pass
+class ReleaseView(ListView):
+    
+    template_name = 'releases.html'
+    
+    def get(self, request, repository=None):
+        
+        if repository:
+            
+            rep = Repository.objects.get(name=repository)
+            
+            if rep:
+                
+                releases = Release.objects.filter(repository=rep)
+                return render(request, self.template_name, {'releases': releases})
+
+        return HttpResponse('Não encontrado!')
+    
+class PullRequestView(ListView):
+    template_name = 'pull_request.html'
+
+    def get(self, request,  repository=None):
+        
+        if repository:
+            
+            rep = Repository.objects.get(name=repository)
+            
+            if rep:
+                
+                pull_requests = PullRequest.objects.filter(repository=rep)
+                return render(request, self.template_name, {'pull_requests': pull_requests})
+
+        return HttpResponse('Não encontrado!')
+    
 class LogoutView(ListView):
     template_name = 'auth/login.html'
     model = User
@@ -116,7 +161,7 @@ def get_repo(request):
     
     if repo:
         
-        result = get_git_instaweb(repository_name)
+        result = GitManager.get_git_instaweb(repository_name)
     else:
         
         repositories = Repository.objects.all()
