@@ -35,10 +35,3 @@ class OS():
         exit_code = os.system(f"{cmd} > {OS.path}{OS.filename}")
         output    = OS.__readfile()
         return OSResult(exit_code=exit_code, output=output)
-    
-if __name__ == '__main__':
-    
-    result = OS._system('ping 1.1.1.1')
-    
-    print(result.exit_code)
-    print(result.output)

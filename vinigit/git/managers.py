@@ -1,25 +1,54 @@
 import os, environ
 from vinigit.settings import BASE_DIR
+from git.utils import OS
 from git.models import Repository, LastInstaWebPath
 
 class GitManager():
     
-    def git_push(git_dir, branch):
-        os.chdir(f'{git_dir}') 
-        return os.system(f'git push origin {branch}')
+    def create_tag(rep_name, tag_name):
         
-    def git_clone(git_url, dst_clone):
-        return os.system(f'git clone {git_url} {dst_clone}')
-    
-    def git_merge(git_url, from_branch, to_branch, message=None):
-        
-        clone_result = GitManager.git_clone(git_url, '/tmp/')
-        
-        if clone_result and clone_result == 0:
+        try:
+            GitManager.git_clone(rep_name, '/tmp/')
+            os.chdir(f'/tmp/{rep_name}')
+            os.system(f'git push origin {tag_name}')
+            return True
+        except:
+            return False
             
-            rep_name = git_url.split('/')[-1].replace('.git', '')
-            os.chdir(f'/tmp/{rep_name}')        
-            return os.system(f'git merge {from_branch} {to_branch}')
+    def get_branches(rep_name):
+        
+        env = environ.Env()
+        environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+        
+        try:
+            os.chdir(f'{env("GIT_PATH")}/{rep_name}.{env("REPO_EXTENTION")}/refs/heads/')
+            os_result = OS._system('ls')
+        except:
+            return []
+        
+        branches = os_result.output.split('\n')
+        return [] if len(branches) == 1 and branches[0] == '' else branches
+
+    def git_push(git_dir, branch):
+        
+        os.chdir(f'{git_dir}') 
+        return True if os.system(f'git push origin {branch}') == 0 else False
+        
+    def git_clone(rep_name, dst_clone):
+        
+        env = environ.Env()
+        environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+    
+        return os.system(f'git clone {env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{rep_name}.{env("REPO_EXTENTION")} {dst_clone}{rep_name}')
+    
+    def git_merge(rep_name, from_branch, to_branch):
+        
+        GitManager.git_clone(rep_name, '/tmp/')
+        
+        os.chdir(f'/tmp/{rep_name}')    
+        os.system(f'git checkout {from_branch}')
+        os.system(f'git checkout {to_branch}')
+        return True if os.system(f'git merge {from_branch} {to_branch}') == 0 else False
         
     def get_git_instaweb(repository_name):
         
@@ -56,7 +85,7 @@ class GitManager():
 class RepositoryManager():
     
     def remove_dir(dir_path):
-        return os.system(f'rm -r {dir_path}')
+        return os.system(f'rm --recursive --force {dir_path}')
     
     def remove_repository(id):
         env = environ.Env()
@@ -67,7 +96,7 @@ class RepositoryManager():
         try:
            
             path = f'{env("GIT_PATH")}/{rep.nome}.{env("REPO_EXTENTION")}'
-            os.system(f'rm -r {path}')
+            os.system(f'rm --recursive --force {path}')
             rep.delete()
         except OSError as e:
             
@@ -90,7 +119,7 @@ class RepositoryManager():
                 os.chdir(directory)
                 os.system('git init --bare')
 
-                Repository(nome=input_value).save()
+                Repository(name=input_value).save()
 
                 return True, False
         except OSError as e:
