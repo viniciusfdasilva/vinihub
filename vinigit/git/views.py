@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib import messages
 from git.managers import RepositoryManager, GitManager
-from git.forms import UserForm, PullRequestForm
+from git.forms import UserForm, PullRequestForm, ReleaseForm
 from git.models import Repository, PullRequest, Release
 
 class ReleaseDetailView(ListView):
@@ -106,9 +106,15 @@ class ReleaseView(ListView):
         rep = Repository.objects.get(name=repository)
         
         if rep:
+            form = ReleaseForm()
+            
+            context = {
+                'releases': releases,
+                'form'    : form    ,
+            }
             
             releases = Release.objects.filter(repository=rep)
-            return render(request, self.template_name, {'releases': releases})
+            return render(request, self.template_name, context=context)
 
 class PullRequestView(ListView):
     template_name = 'pull_request.html'
