@@ -117,16 +117,18 @@
             <center>
                 {{form}}
 
+                
                 <center>
                   <div>
-                    <span>To:</span>
-                    <select>
+                    <span >From:</span>
+
+                    <select name="from_branches">
                       {% for branch in branches %}   
                         <option value="{{branch}}">{{branch}}</option>
                       {% endfor %}
                     </select>&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;
-                    <span >From:</span>
-                    <select>
+                    <span>To:</span>
+                    <select name="to_branches">
                       {% for branch in branches %}   
                         <option value="{{branch}}">{{branch}}</option>
                       {% endfor %}
@@ -138,12 +140,49 @@
               {% if branches|length == 0 %}
                 <input disabled class="form-control btn rounded submit px-3" style="background-color:#FF4500;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px; width: 500px; height: 50px" value="Pull Request" type="submit">
               {% else %}
-              <input class="form-control btn rounded submit px-3" style="background-color:#FF4500;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px; width: 500px; height: 50px" value="Pull Request" type="submit">
+                <input class="form-control btn rounded submit px-3" style="background-color:#FF4500;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px; width: 500px; height: 50px" value="Pull Request" type="submit">
               {% endif %}
 
             </center>
-
         </form>
+          <br/><br/>
+          <div>
+            <center>
+              {% if merged_branch is not None and merged_branch %}
+                {% if pull_request_success %}
+
+                  <div style="background-color: purple; border-radius: 50%; width: 60px; height: 60px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" color="white" class="bi bi-check-lg" viewBox="0 0 16 16">
+                      <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                    </svg>
+                  </div>
+                  </br>
+                  <span class="form-control btn rounded px-3" style="background-color:purple;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px; width: 500px; height: 50px">Merge feito com sucesso!</span>
+                {% else %}
+                    <form method="POST" action="/pull-request/{{repository}}/{{id_pullrequest}}/{{to_branch}}/merge/">
+                      {% csrf_token %}
+
+                      <div style="background-color: green; border-radius: 50%; width: 60px; height: 60px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" color="white" class="bi bi-check-lg" viewBox="0 0 16 16">
+                          <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
+                        </svg>
+                      </div>
+                      </br>
+                      <h4 style="color: green;">Merge pode ser realizado automaticamente!</h4>
+                      <input class="form-control btn rounded submit px-3" style="background-color:green;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px; width: 500px; height: 50px" value="Merge" type="submit">
+                    </form>
+                {% endif %}
+
+              {% elif merged_branch is not None %}
+                  <div style="background-color: red; border-radius: 50%; width: 60px; height: 60px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" color="white" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                      <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
+                    </svg>
+                  </div>
+                  <h4 style="color: red;">Existem conflitos para serem corrigidos manualmente!</h4>
+              {% endif %}
+            </center>
+          </div>
 
           <div><br/>
             {% for message in messages %}                                    
@@ -152,14 +191,22 @@
           </div>
           
           
+          
           <div class="row" style="margin-left: auto; margin-top: 40px">
 
             {% for pull_request in pull_requests %}
 
-                <div onclick="/repo/{{repositorio}}" class="card d-inline" style="width:300px; height: 200px; margin: 10px;">
+                <div onclick="/repo/{{pull_request}}" class="card d-inline" style="width:300px; height: 200px; margin: 10px;">
+                  <a href="http://localhost:8000/pull-request/{{repository}}/{{pull_request.id}}/"/>
+                  {% if pull_request.id_merged %}
+                    <svg xmlns="http://www.w3.org/2000/svg" color="#ff4500" width="25" height="25" fill="currentColor" class="bi bi-git" viewBox="0 0 16 16">
+                      <path d="M15.698 7.287 8.712.302a1.03 1.03 0 0 0-1.457 0l-1.45 1.45 1.84 1.84a1.223 1.223 0 0 1 1.55 1.56l1.773 1.774a1.224 1.224 0 0 1 1.267 2.025 1.226 1.226 0 0 1-2.002-1.334L8.58 5.963v4.353a1.226 1.226 0 1 1-1.008-.036V5.887a1.226 1.226 0 0 1-.666-1.608L5.093 2.465l-4.79 4.79a1.03 1.03 0 0 0 0 1.457l6.986 6.986a1.03 1.03 0 0 0 1.457 0l6.953-6.953a1.03 1.03 0 0 0 0-1.457"/>
+                    </svg>
+                  {% endif %}
                   <div class="card-body" style="margin-top: 10px">
+                    
                     <center>
-                    <h3 class="card-text" style="color: gray; padding: 10px">{{repositorio.nome}}</h3>
+                    <h3 class="card-text" style="color: gray; padding: 10px">{{pull_request.title}}</h3>
                       <button id="{{pull_request.id}}" type="button" class="btn btn-danger">
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
                               <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path>

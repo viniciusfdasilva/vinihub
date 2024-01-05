@@ -11,7 +11,7 @@ class GitManager():
         environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
         
         try:
-            os.chdir(f'{env("GIT_PATH")}/{rep_name}.{env("REPO_EXTENTION")}/heads/')
+            os.chdir(f'{env("GIT_PATH")}/{rep_name}.{env("REPO_EXTENTION")}/refs/heads/')
             os_result = OS._system('ls')
         except:
             return []
@@ -35,7 +35,9 @@ class GitManager():
         
         GitManager.git_clone(rep_name, '/tmp/')
         
-        os.chdir(f'/tmp/{rep_name}')        
+        os.chdir(f'/tmp/{rep_name}')    
+        os.system(f'git checkout {from_branch}')
+        os.system(f'git checkout {to_branch}')
         return True if os.system(f'git merge {from_branch} {to_branch}') == 0 else False
         
     def get_git_instaweb(repository_name):
@@ -73,7 +75,7 @@ class GitManager():
 class RepositoryManager():
     
     def remove_dir(dir_path):
-        return os.system(f'rm -r {dir_path}')
+        return os.system(f'rm --recursive --force {dir_path}')
     
     def remove_repository(id):
         env = environ.Env()
@@ -84,7 +86,7 @@ class RepositoryManager():
         try:
            
             path = f'{env("GIT_PATH")}/{rep.nome}.{env("REPO_EXTENTION")}'
-            os.system(f'rm -r {path}')
+            os.system(f'rm --recursive --force {path}')
             rep.delete()
         except OSError as e:
             
