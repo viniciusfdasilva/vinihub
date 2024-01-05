@@ -20,4 +20,4 @@ class ReleaseForm(ModelForm):
     
     class Meta:
         model = Release
-        fiealds = ['release_name', 'description', 'changelog']
+        fields = ['release_name', 'description', 'changelog']

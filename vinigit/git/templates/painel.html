@@ -101,7 +101,7 @@
     
     <div class="div">
       <div style="margin-left: 570px">
-        <a href="/git/logout"><img class="d-block mx-auto mb-4" src="{% static 'img/user.png' %}" alt="" width="60" height="40"></a>
+        <a href="/logout"><img class="d-block mx-auto mb-4" src="{% static 'img/user.png' %}" alt="" width="60" height="40"></a>
       </div>
     </div>  
     </div>
@@ -112,7 +112,7 @@
       </div>
     </div>
        
-        <form method="POST" action="/git/painel">
+        <form method="POST" action="/painel">
             {% csrf_token %}
             <center>
                 <input type="text" class="form-control" name="value" id="value" style="width: 500px; height: 50px" placeholder="Nome do Repositório ou Chave pública" value="" required=""><br/>
@@ -144,21 +144,25 @@
 
             {% for repositorio in repositorios %}
 
-                <div onclick="/repo/{{repositorio}}" class="card d-inline" style="width:300px; height: 200px; margin: 10px;">
+                <div class="card d-inline" style="width:300px; height: 200px; margin: 10px;">
                   <div class="card-body" style="margin-top: 10px">
                     <center>
-                    <h3 class="card-text" style="color: gray; padding: 10px">{{repositorio.nome}}</h3>
-                      <button id="{{repositorio.id}}" type="button" class="btn btn-danger">
+                    <h3 class="card-text" style="color: gray; padding: 10px">{{repositorio.name}}</h3>
+                      <button id="{{repositorio.id}}" type="button" class="btn btn-danger copy">
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
                               <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path>
                               <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"></path>
                           </svg>
                       </button>
                     
-                      <button id="{{repositorio.nome}}" type="button" class="btn text-white" style="background-color: #FF4500;">
+                      <button id="{{repositorio.name}}" type="button" class="btn text-white copy" style="background-color: #FF4500;">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-code" viewBox="0 0 16 16">
                           <path d="M5.854 4.854a.5.5 0 1 0-.708-.708l-3.5 3.5a.5.5 0 0 0 0 .708l3.5 3.5a.5.5 0 0 0 .708-.708L2.707 8l3.147-3.146zm4.292 0a.5.5 0 0 1 .708-.708l3.5 3.5a.5.5 0 0 1 0 .708l-3.5 3.5a.5.5 0 0 1-.708-.708L13.293 8l-3.147-3.146z"/>
                         </svg>
+                      </button>
+
+                      <button onclick="pull_request('{{repositorio.name}}')" id="{{repositorio.name}}" type="button" class="btn text-white" style="background-color: #FF4500;"/>
+                      <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M305.8 2.1C314.4 5.9 320 14.5 320 24V64h16c70.7 0 128 57.3 128 128V358.7c28.3 12.3 48 40.5 48 73.3c0 44.2-35.8 80-80 80s-80-35.8-80-80c0-32.8 19.7-61 48-73.3V192c0-35.3-28.7-64-64-64H320v40c0 9.5-5.6 18.1-14.2 21.9s-18.8 2.3-25.8-4.1l-80-72c-5.1-4.6-7.9-11-7.9-17.8s2.9-13.3 7.9-17.8l80-72c7-6.3 17.2-7.9 25.8-4.1zM104 80A24 24 0 1 0 56 80a24 24 0 1 0 48 0zm8 73.3V358.7c28.3 12.3 48 40.5 48 73.3c0 44.2-35.8 80-80 80s-80-35.8-80-80c0-32.8 19.7-61 48-73.3V153.3C19.7 141 0 112.8 0 80C0 35.8 35.8 0 80 0s80 35.8 80 80c0 32.8-19.7 61-48 73.3zM104 432a24 24 0 1 0 -48 0 24 24 0 1 0 48 0zm328 24a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg>
                       </button>
                       </center>    
                   </div>
@@ -178,6 +182,15 @@
 
     <script>
       window.CSRF_TOKEN = "{{ csrf_token }}"
+      
+      function pull_request(repository_name){
+        $.get("pull-request/" + repository_name + "/")
+        window.location.href = "pull-request/" + repository_name + "/"
+      }
+      $(".btn-danger:button").click(function() {
+        $('#modal').modal('show')
+        $('#button_modal').val(this.id)
+      })
 
       $(".btn-danger:button").click(function() {
         $('#modal').modal('show')
@@ -185,14 +198,14 @@
       })
 
       function remove(){
-        $.post("/git/painel", {id_repo: $('#button_modal').val(), csrfmiddlewaretoken: window.CSRF_TOKEN}, function(response) {
+        $.post("/painel", {id_repo: $('#button_modal').val(), csrfmiddlewaretoken: window.CSRF_TOKEN}, function(response) {
           alert(response)
           location.href = ""
         })
       }
 
-      $(".text-white:button").click(function() {
-        $.post("/git/painel", {id: this.id, csrfmiddlewaretoken: window.CSRF_TOKEN}, function(response) {
+      $(".copy").click(function() {
+        $.post("/painel", {id: this.id, csrfmiddlewaretoken: window.CSRF_TOKEN}, function(response) {
           $("#url").remove()
           $("#botao").remove()
           $("#item_click").remove()

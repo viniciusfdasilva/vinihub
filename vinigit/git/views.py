@@ -93,9 +93,9 @@ class PullRequestView(ListView):
     template_name = 'pull_request.html'
 
     def get(self, request,  repository):
-              
+            
         rep = Repository.objects.get(name=repository)
-                    
+        
         if rep:
         
             rep_name = rep.name
@@ -106,8 +106,10 @@ class PullRequestView(ListView):
             context = {
                 'pull_requests': pull_requests,
                 'branches'     : GitManager.get_branches(rep_name),
+                'repository'   : repository,
                 'form'         : form
             }
+
             return render(request, self.template_name, context=context)
 
     def post(self, request, repository):
@@ -115,8 +117,6 @@ class PullRequestView(ListView):
         rep = Repository.objects.get(name=repository)
         
         if rep:
-            
-            rep_name = rep.name
             
             from_branch = request.POST.get('from_branch')
             to_branch   = request.POST.get('to_branch')
@@ -127,10 +127,11 @@ class PullRequestView(ListView):
 
             form = PullRequestForm()
             
-            is_merged_branch = GitManager.git_merge(rep_name, from_branch, to_branch)
+            is_merged_branch = GitManager.git_merge(rep.name, from_branch, to_branch)
+
             
             if not is_merged_branch:
-                RepositoryManager.remove_dir(f'/tmp/{rep_name}')
+                RepositoryManager.remove_dir(f'/tmp/{rep.name}')
             
             pull_request = PullRequest.objects.create(
                     from_branch = from_branch     ,
@@ -145,7 +146,7 @@ class PullRequestView(ListView):
             
             context = {
                 'pull_requests': pull_requests,
-                'branches'     : GitManager.get_branches(rep_name),
+                'branches'     : GitManager.get_branches(rep.name),
                 'form'         : form,
                 'merged_branch': is_merged_branch,
                 'created'      : created
@@ -160,7 +161,7 @@ class LogoutView(ListView):
     def get(self, request):
 
         logout(request=request)
-        return redirect('/git/')
+        return redirect('/')
         #return render(request, self.template_name)
 
 
@@ -193,7 +194,7 @@ class LoginView(ListView):
             if user is not None:
                 login(request, user)
 
-                return redirect('/git/painel')
+                return redirect('/painel')
 
         messages.info(request,'Credenciais incorretas')
         return render(request, self.template_name, {'form': form})

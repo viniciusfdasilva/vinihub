@@ -10,10 +10,14 @@ class GitManager():
         env = environ.Env()
         environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
         
-        os.chdir(f'{env("GIT_PATH")}/{rep_name}.{env("REPO_EXTENTION")}/heads/')
-        os_result = OS._system('ls')
+        try:
+            os.chdir(f'{env("GIT_PATH")}/{rep_name}.{env("REPO_EXTENTION")}/heads/')
+            os_result = OS._system('ls')
+        except:
+            return []
         
-        return os_result.output.split('\n')
+        branches = os_result.output.split('\n')
+        return [] if len(branches) == 1 and branches[0] == '' else branches
 
     def git_push(git_dir, branch):
         
@@ -24,17 +28,15 @@ class GitManager():
         
         env = environ.Env()
         environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-        
-        return os.system(f'git clone {env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{env("rep_name")}.{env("REPO_EXTENTION")} {dst_clone}')
+    
+        return os.system(f'git clone {env("GIT_USER")}@{env("DOMAIN")}:{env("GIT_PATH")}/{rep_name}.{env("REPO_EXTENTION")} {dst_clone}{rep_name}')
     
     def git_merge(rep_name, from_branch, to_branch):
         
-        clone_result = GitManager.git_clone(rep_name, '/tmp/')
+        GitManager.git_clone(rep_name, '/tmp/')
         
-        if clone_result and clone_result == 0:
-            
-            os.chdir(f'/tmp/{rep_name}')        
-            return True if os.system(f'git merge {from_branch} {to_branch}') == 0 else False
+        os.chdir(f'/tmp/{rep_name}')        
+        return True if os.system(f'git merge {from_branch} {to_branch}') == 0 else False
         
     def get_git_instaweb(repository_name):
         
@@ -105,7 +107,7 @@ class RepositoryManager():
                 os.chdir(directory)
                 os.system('git init --bare')
 
-                Repository(nome=input_value).save()
+                Repository(name=input_value).save()
 
                 return True, False
         except OSError as e:
