@@ -153,7 +153,6 @@ class PullRequestView(ListView):
             form = PullRequestForm()
             
             is_merged_branch = GitManager.git_merge(rep.name, from_branch, to_branch)
-
             
             if not is_merged_branch:
                 RepositoryManager.remove_dir(f'/tmp/{rep.name}')
