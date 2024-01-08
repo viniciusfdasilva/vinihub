@@ -23,6 +23,7 @@ urlpatterns = [
     path('repo/<str:repository>/', views.get_repo              , name='repo'  ),
     path('logout'                , views.LogoutView.as_view()  , name='logout'),
     path('release/<str:repository>/', views.ReleaseView.as_view(), name='release'),
+    path('graph/<str:repository>/', views.GitGraphView.as_view(), name='graph'),
     path('release/<str:repository>/<int:id_release>/', views.ReleaseDetailView.as_view(), name='release_detail'),
     path('pull-request/<str:repository>/<int:id_pullrequest>/', views.PullRequestDetailView.as_view(), name='pullrequest_detail'),
     path('pull-request/<str:repository>/<int:id_pullrequest>/<str:to_branch>/merge/', views.PullRequestMergeView.as_view(), name='pullrequest_detail'),
