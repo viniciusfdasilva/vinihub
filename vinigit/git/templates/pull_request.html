@@ -148,30 +148,19 @@
           <br/><br/>
           <div>
             <center>
-              {% if merged_branch is not None and merged_branch %}
-                {% if pull_request_success %}
+              {% if merged_branch is not None and merged_branch %}         
+                <form method="POST" action="/pull-request/{{repository}}/{{id_pullrequest}}/{{to_branch}}/merge/">
+                  {% csrf_token %}
 
-                  <div style="background-color: purple; border-radius: 50%; width: 60px; height: 60px;">
+                  <div style="background-color: green; border-radius: 50%; width: 60px; height: 60px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" color="white" class="bi bi-check-lg" viewBox="0 0 16 16">
                       <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
                     </svg>
                   </div>
                   </br>
-                  <span class="form-control btn rounded px-3" style="background-color:purple;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px; width: 500px; height: 50px">Merge feito com sucesso!</span>
-                {% else %}
-                    <form method="POST" action="/pull-request/{{repository}}/{{id_pullrequest}}/{{to_branch}}/merge/">
-                      {% csrf_token %}
-
-                      <div style="background-color: green; border-radius: 50%; width: 60px; height: 60px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" color="white" class="bi bi-check-lg" viewBox="0 0 16 16">
-                          <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
-                        </svg>
-                      </div>
-                      </br>
-                      <h4 style="color: green;">Merge pode ser realizado automaticamente!</h4>
-                      <input class="form-control btn rounded submit px-3" style="background-color:green;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px; width: 500px; height: 50px" value="Merge" type="submit">
-                    </form>
-                {% endif %}
+                  <h4 style="color: green;">Merge pode ser realizado automaticamente!</h4>
+                  <input class="form-control btn rounded submit px-3" style="background-color:green;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px; width: 500px; height: 50px" value="Merge" type="submit">
+                </form>
 
               {% elif merged_branch is not None %}
                   <div style="background-color: red; border-radius: 50%; width: 60px; height: 60px;">

@@ -10,6 +10,8 @@ from django.contrib import messages
 from git.managers import RepositoryManager, GitManager
 from git.forms import UserForm, PullRequestForm, ReleaseForm
 from git.models import Repository, PullRequest, Release
+from git.utils import Utils
+
 
 class ReleaseDetailView(ListView):
     
@@ -102,56 +104,72 @@ class ReleaseView(ListView):
     template_name = 'release.html'
     
     def get(self, request, repository):
-          
+        
+        utils = Utils()
         rep = Repository.objects.get(name=repository)
         
         if rep:
+            
             form = ReleaseForm()
             releases = Release.objects.filter(repository=rep)
 
             context = {
-                'releases': releases,
-                'form'    : form    ,
+                'releases'  : releases                 ,
+                'form'      : form                     ,
+                'repository': rep.name                 ,
+                'domain'    : utils.get_domain()       ,
+                'git_user'  : utils.get_user()         ,
+                'path'      : utils.get_git_path()     ,
+                'extention' : utils.get_git_extention()
             }
-            
-            
+                        
             return render(request, self.template_name, context=context)
 
     def post(self, request, repository):
 
         rep = Repository.objects.get(name=repository)
-        
-        context = {
-            'releases' : releases,
-            'form'     : form    ,
-        }
 
         if rep:
-
+            
+            releases = Release.objects.filter(repository=rep)
             form = ReleaseForm()
+            
+            
+            utils = Utils()
+            
+            context = {
+                'releases'  : releases                 ,
+                'form'      : form                     ,
+                'repository': rep.name                 ,
+                'domain'    : utils.get_domain()       ,
+                'git_user'  : utils.get_user()         ,
+                'path'      : utils.get_git_path()     ,
+                'extention' : utils.get_git_extention()
+            }
+
+            release_name = request.POST.get('release_name') 
+            description  = request.POST.get('description')
+            changelog    = request.POST.get('changelog')
 
             tag_created = GitManager.create_tag(rep.name, release_name)
 
             if tag_created:
                 
-                releases = Release.objects.filter(repository=rep)
-                
-                release_name = request.POST.get('release_name') 
-                description  = request.POST.get('description')
-                changelog    = request.POST.get('changelog')
-
                 release = Release.objects.create(
                     release_name=release_name,
-                    description=description,
-                    changelog=changelog
+                    description=description  ,
+                    changelog=changelog      ,
+                    repository=rep
                 )
-
-                context['created'] = True if release else False
-                
+           
+                if release:
+                    messages.info(request,'Versão criada com sucesso!')
+                else:
+                    messages.error(request, 'Erro ao criar versão!')
                 return render(request, self.template_name, context=context)
             
-        context['created'] = False
-        return render(request, self.template_name, context=context)
+            messages.error(request,'Erro ao criar versão!')
+            return render(request, self.template_name, context=context)
 
 class PullRequestView(ListView):
     
@@ -204,7 +222,11 @@ class PullRequestView(ListView):
                     repository  = rep             ,        
             )
                 
-            created = True if pull_request else False
+            if pull_request:
+                messages.info(request, 'Pull Request realizado com sucesso!')
+            else:
+                messages.error(request, 'Erro ao realizar Pull Request!')
+                            
             pull_requests = PullRequest.objects.filter(repository=rep)
             
             context = {
@@ -213,7 +235,6 @@ class PullRequestView(ListView):
                 'branches'      : GitManager.get_branches(rep.name),
                 'form'          : form                             ,
                 'merged_branch' : is_merged_branch                 ,
-                'created'       : created                          ,
                 'id_pullrequest': pull_request.pk                  ,
                 'repository'    : repository                       ,
             }

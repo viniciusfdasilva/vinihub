@@ -10,9 +10,11 @@ class GitManager():
         try:
             
             if not os.path.exists(f'/tmp/{rep_name}'):
-                GitManager.git_clone(rep_name, '/tmp/')
+                os.system(f'rm -r /tmp/{rep_name}')
             
+            GitManager.git_clone(rep_name, '/tmp/')    
             os.chdir(f'/tmp/{rep_name}')
+            os.system(f'git branch {tag_name}')
             os.system(f'git push origin {tag_name}')
             return True
         except:
