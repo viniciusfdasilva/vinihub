@@ -16,6 +16,7 @@ class GitManager():
             os.chdir(f'/tmp/{rep_name}')
             os.system(f'git branch {tag_name}')
             os.system(f'git push origin {tag_name}')
+            RepositoryManager.remove_dir(f'/tmp/{rep_name}')
             return True
         except:
             return False
