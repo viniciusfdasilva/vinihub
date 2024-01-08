@@ -8,7 +8,10 @@ class GitManager():
     def create_tag(rep_name, tag_name):
         
         try:
-            GitManager.git_clone(rep_name, '/tmp/')
+            
+            if not os.path.exists(f'/tmp/{rep_name}'):
+                GitManager.git_clone(rep_name, '/tmp/')
+            
             os.chdir(f'/tmp/{rep_name}')
             os.system(f'git push origin {tag_name}')
             return True
