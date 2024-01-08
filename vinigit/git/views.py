@@ -107,14 +107,37 @@ class ReleaseView(ListView):
         
         if rep:
             form = ReleaseForm()
-            
+            releases = Release.objects.filter(repository=rep)
+
             context = {
                 'releases': releases,
                 'form'    : form    ,
             }
             
-            releases = Release.objects.filter(repository=rep)
+            
             return render(request, self.template_name, context=context)
+
+    def post(self, request, repository):
+
+        rep = Repository.objects.get(name=repository)
+
+        if rep:
+
+            form = ReleaseForm()
+
+            tag_created = GitManager.create_tag(rep.name, release_name)
+
+            release_name = request.POST.get('release_name') 
+            description  = request.POST.get('description')
+            changelog    = request.POST.get('changelog')
+
+            release = Release.objects.create(
+                release_name=release_name,
+                description=description,
+                changelog=changelog
+            )
+
+            created = True if release else False
 
 class PullRequestView(ListView):
     template_name = 'pull_request.html'
