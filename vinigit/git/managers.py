@@ -8,12 +8,41 @@ class GitManager():
     def create_tag(rep_name, tag_name):
         
         try:
-            GitManager.git_clone(rep_name, '/tmp/')
-            os.chdir(f'/tmp/{rep_name}')
-            os.system(f'git push origin {tag_name}')
-            return True
+            
+            if len(GitManager.get_branches(rep_name)) > 0:
+            
+                if os.path.exists(f'/tmp/{rep_name}'):
+                    RepositoryManager.remove_dir(f'/tmp/{rep_name}')
+
+                GitManager.git_clone(rep_name, '/tmp/')    
+                os.chdir(f'/tmp/{rep_name}')
+                os.system(f'git branch {tag_name}')
+                os.system(f'git push origin {tag_name}')
+                RepositoryManager.remove_dir(f'/tmp/{rep_name}')
+                return True
+            return False
         except:
             return False
+        
+    def get_commits(rep_name):
+        
+        env = environ.Env()
+        environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+        
+        try:
+            
+            GitManager.git_clone(rep_name, '/tmp/') 
+            
+            os.chdir(f'/tmp/{rep_name}/')
+            
+            for branch in GitManager.get_branches(rep_name):
+                os.system(f'git checkout {branch}')
+                os.system(f'git pull origin {branch}')
+            
+            os_result_output = OS._system('git-graph').output
+            return os_result_output
+        except:
+            return None
             
     def get_branches(rep_name):
         

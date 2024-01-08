@@ -10,6 +10,8 @@ from django.contrib import messages
 from git.managers import RepositoryManager, GitManager
 from git.forms import UserForm, PullRequestForm, ReleaseForm
 from git.models import Repository, PullRequest, Release
+from git.utils import Utils
+
 
 class ReleaseDetailView(ListView):
     
@@ -39,19 +41,19 @@ class PullRequestMergeView(ListView):
         
         pull_request = PullRequest.objects.get(id=id_pullrequest)
         rep          = Repository.objects.get(name=repository)
-
+  
         if pull_request and rep:
             form = PullRequestForm()
             
             rep_name = rep.name
             pull_requests = PullRequest.objects.filter(repository=rep)
-                
+    
             context = {
                 'pull_requests': pull_requests                    ,
                 'branches'     : GitManager.get_branches(rep_name),
                 'form'         : form                             ,
             }
-            
+        
             return render(request, self.template_name, context=context)
         
     def post(self, request, repository, to_branch, id_pullrequest):
@@ -69,10 +71,16 @@ class PullRequestMergeView(ListView):
             pull_requests = PullRequest.objects.filter(repository=rep)
                 
             form = PullRequestForm()
+            
+            if pull_request:
+                messages.info(request, 'Pull Request realizado com sucesso!')
+            else:
+                messages.error(request, 'Erro ao realizar Pull Request!')
                 
             context = {
                 'pull_requests'        : pull_requests                    ,
                 'branches'             : GitManager.get_branches(rep_name),
+                'repository'           : repository                       ,
                 'form'                 : form                             ,
                 'merged_branch'        : True                             ,
                 'pull_request_success' : is_successfully
@@ -96,27 +104,96 @@ class PullRequestDetailView(ListView):
         }
         
         return render(request, self.template_name, context=context)
+
+class GitGraphView(ListView):
+
+    def get(self, request, repository):
+        
+        rep = Repository.objects.get(name=repository)    
+
+        if rep:
+            
+            commits = GitManager.get_commits(repository)
+            return HttpResponse(f'<textarea style="width:100%; height:100%;" readonly>{commits}</textarea>')
         
 class ReleaseView(ListView):
     
     template_name = 'release.html'
     
     def get(self, request, repository):
-          
+        
+        utils = Utils()
         rep = Repository.objects.get(name=repository)
         
         if rep:
-            form = ReleaseForm()
             
+            form = ReleaseForm()
+            releases = Release.objects.filter(repository=rep)
+
             context = {
-                'releases': releases,
-                'form'    : form    ,
+                'releases'  : releases                 ,
+                'form'      : form                     ,
+                'repository': rep.name                 ,
+                'domain'    : utils.get_domain()       ,
+                'git_user'  : utils.get_user()         ,
+                'path'      : utils.get_git_path()     ,
+                'extention' : utils.get_git_extention()
             }
+                        
+            if len(GitManager.get_branches(repository)) > 0:
+                return render(request, self.template_name, context=context)
+            
+            messages.error(request, 'Não foi encontrada nenhuma branch!')
+            return render(request, self.template_name, context=context)
+
+    def post(self, request, repository):
+
+        rep = Repository.objects.get(name=repository)
+
+        if rep:
             
             releases = Release.objects.filter(repository=rep)
+            form = ReleaseForm()
+            
+            
+            utils = Utils()
+            
+            context = {
+                'releases'  : releases                 ,
+                'form'      : form                     ,
+                'repository': rep.name                 ,
+                'domain'    : utils.get_domain()       ,
+                'git_user'  : utils.get_user()         ,
+                'path'      : utils.get_git_path()     ,
+                'extention' : utils.get_git_extention()
+            }
+
+            release_name = request.POST.get('release_name') 
+            description  = request.POST.get('description')
+            changelog    = request.POST.get('changelog')
+
+            tag_created = GitManager.create_tag(rep.name, release_name)
+
+            if tag_created:
+                
+                release = Release.objects.create(
+                    release_name = release_name ,
+                    description  = description  ,
+                    changelog    = changelog    ,
+                    repository   = rep
+                )
+           
+                if release:
+                    messages.info(request,'Versão criada com sucesso!')
+                else:
+                    messages.error(request, 'Erro ao criar versão!')
+                return render(request, self.template_name, context=context)
+            
+            messages.error(request,'Erro ao criar versão!')
             return render(request, self.template_name, context=context)
 
 class PullRequestView(ListView):
+    
     template_name = 'pull_request.html'
 
     def get(self, request,  repository):
@@ -165,8 +242,7 @@ class PullRequestView(ListView):
                     is_merged   = is_merged_branch,
                     repository  = rep             ,        
             )
-                
-            created = True if pull_request else False
+                            
             pull_requests = PullRequest.objects.filter(repository=rep)
             
             context = {
@@ -175,7 +251,7 @@ class PullRequestView(ListView):
                 'branches'      : GitManager.get_branches(rep.name),
                 'form'          : form                             ,
                 'merged_branch' : is_merged_branch                 ,
-                'created'       : created                          ,
+                'created'       : True if pull_request else False  ,
                 'id_pullrequest': pull_request.pk                  ,
                 'repository'    : repository                       ,
             }

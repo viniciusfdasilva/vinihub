@@ -148,30 +148,19 @@
           <br/><br/>
           <div>
             <center>
-              {% if merged_branch is not None and merged_branch %}
-                {% if pull_request_success %}
+              {% if merged_branch is not None and merged_branch %}         
+                <form method="POST" action="/pull-request/{{repository}}/{{id_pullrequest}}/{{to_branch}}/merge/">
+                  {% csrf_token %}
 
-                  <div style="background-color: purple; border-radius: 50%; width: 60px; height: 60px;">
+                  <div style="background-color: green; border-radius: 50%; width: 60px; height: 60px;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" color="white" class="bi bi-check-lg" viewBox="0 0 16 16">
                       <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
                     </svg>
                   </div>
                   </br>
-                  <span class="form-control btn rounded px-3" style="background-color:purple;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px; width: 500px; height: 50px">Merge feito com sucesso!</span>
-                {% else %}
-                    <form method="POST" action="/pull-request/{{repository}}/{{id_pullrequest}}/{{to_branch}}/merge/">
-                      {% csrf_token %}
-
-                      <div style="background-color: green; border-radius: 50%; width: 60px; height: 60px;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" color="white" class="bi bi-check-lg" viewBox="0 0 16 16">
-                          <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"/>
-                        </svg>
-                      </div>
-                      </br>
-                      <h4 style="color: green;">Merge pode ser realizado automaticamente!</h4>
-                      <input class="form-control btn rounded submit px-3" style="background-color:green;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px; width: 500px; height: 50px" value="Merge" type="submit">
-                    </form>
-                {% endif %}
+                  <h4 style="color: green;">Merge pode ser realizado automaticamente!</h4>
+                  <input class="form-control btn rounded submit px-3" style="background-color:green;font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; font-size: 19px; width: 500px; height: 50px" value="Merge" type="submit">
+                </form>
 
               {% elif merged_branch is not None %}
                   <div style="background-color: red; border-radius: 50%; width: 60px; height: 60px;">
@@ -179,7 +168,7 @@
                       <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8z"/>
                     </svg>
                   </div>
-                  <h4 style="color: red;">Existem conflitos para serem corrigidos manualmente!</h4>
+                  <h4 style="color: red;">Existem conflitos que devem ser corrigidos manualmente!</h4>
               {% endif %}
             </center>
           </div>
@@ -197,8 +186,8 @@
             {% for pull_request in pull_requests %}
 
                 <div onclick="/repo/{{pull_request}}" class="card d-inline" style="width:300px; height: 200px; margin: 10px;">
-                  <a href="http://localhost:8000/pull-request/{{repository}}/{{pull_request.id}}/"/>
-                  {% if pull_request.id_merged %}
+                  <a href="http://localhost:8000/pull-request{{repository}}/{{pull_request.id}}/"/>
+                  {% if pull_request.is_merged %}
                     <svg xmlns="http://www.w3.org/2000/svg" color="#ff4500" width="25" height="25" fill="currentColor" class="bi bi-git" viewBox="0 0 16 16">
                       <path d="M15.698 7.287 8.712.302a1.03 1.03 0 0 0-1.457 0l-1.45 1.45 1.84 1.84a1.223 1.223 0 0 1 1.55 1.56l1.773 1.774a1.224 1.224 0 0 1 1.267 2.025 1.226 1.226 0 0 1-2.002-1.334L8.58 5.963v4.353a1.226 1.226 0 1 1-1.008-.036V5.887a1.226 1.226 0 0 1-.666-1.608L5.093 2.465l-4.79 4.79a1.03 1.03 0 0 0 0 1.457l6.986 6.986a1.03 1.03 0 0 0 1.457 0l6.953-6.953a1.03 1.03 0 0 0 0-1.457"/>
                     </svg>

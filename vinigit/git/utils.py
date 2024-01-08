@@ -1,5 +1,5 @@
-import os
-
+import os, environ
+from vinigit.settings import BASE_DIR
 class OSResult():
     
     def __init__(self, exit_code, output):
@@ -35,3 +35,24 @@ class OS():
         exit_code = os.system(f"{cmd} > {OS.path}{OS.filename}")
         output    = OS.__readfile()
         return OSResult(exit_code=exit_code, output=output)
+
+
+class Utils():
+
+    def __init__(self):
+        self.env = environ.Env()
+        environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+        
+    def get_domain(self):
+
+        return self.env('DOMAIN')
+
+    def get_user(self):
+        return self.env('GIT_USER')
+    
+    def get_git_path(self):
+        return self.env('GIT_PATH')
+    
+    def get_git_extention(self):
+        
+        return self.env('REPO_EXTENTION')
