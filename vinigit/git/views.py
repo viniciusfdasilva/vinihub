@@ -32,6 +32,9 @@ class ReleaseDetailView(ListView):
             }
             
             return render(request, self.template_name, context=context)
+        
+        messages.error(request, 'Repositório ou Release não existe!')
+        return render(request, self.template_name, context={})
 
 class PullRequestMergeView(ListView):
     
@@ -98,18 +101,24 @@ class PullRequestDetailView(ListView):
 
     def get(self, request, repository, id_pullrequest):
           
+        rep          = Repository.objects.get(name=repository)
         pull_request = PullRequest.objects.get(id=id_pullrequest)
         
-        context = {
-            'title'      : pull_request.title,
-            'description': pull_request.description,
-            'is_merged'  : pull_request.is_merged,
-            'repository' : pull_request.repository.name,
-            'to_branch'  : pull_request.to_branch,
-            'from_branch': pull_request.from_branch
-        }
+        if rep and pull_request:
+            
+            context = {
+                'title'      : pull_request.title,
+                'description': pull_request.description,
+                'is_merged'  : pull_request.is_merged,
+                'repository' : pull_request.repository.name,
+                'to_branch'  : pull_request.to_branch,
+                'from_branch': pull_request.from_branch
+            }
+
+            return render(request, self.template_name, context=context)
         
-        return render(request, self.template_name, context=context)
+        messages.error(request, 'Repositório ou Pull Request não existe!')
+        return render(request, self.template_name, context={})
 
 class GitGraphView(ListView):
 
