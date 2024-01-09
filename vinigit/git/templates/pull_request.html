@@ -149,7 +149,7 @@
           <div>
             <center>
               {% if merged_branch is not None and merged_branch %}         
-                <form method="POST" action="/pull-request/{{repository}}/{{id_pullrequest}}/{{to_branch}}/merge/">
+                <form method="POST" action="/pull-request/{{repository}}/{{id_pullrequest}}/merge/">
                   {% csrf_token %}
 
                   <div style="background-color: green; border-radius: 50%; width: 60px; height: 60px;">
@@ -191,19 +191,55 @@
                     <svg xmlns="http://www.w3.org/2000/svg" color="#ff4500" width="25" height="25" fill="currentColor" class="bi bi-git" viewBox="0 0 16 16">
                       <path d="M15.698 7.287 8.712.302a1.03 1.03 0 0 0-1.457 0l-1.45 1.45 1.84 1.84a1.223 1.223 0 0 1 1.55 1.56l1.773 1.774a1.224 1.224 0 0 1 1.267 2.025 1.226 1.226 0 0 1-2.002-1.334L8.58 5.963v4.353a1.226 1.226 0 1 1-1.008-.036V5.887a1.226 1.226 0 0 1-.666-1.608L5.093 2.465l-4.79 4.79a1.03 1.03 0 0 0 0 1.457l6.986 6.986a1.03 1.03 0 0 0 1.457 0l6.953-6.953a1.03 1.03 0 0 0 0-1.457"/>
                     </svg>
-                  {% endif %}
-                  <div class="card-body" style="margin-top: 10px">
+                  
+                    <div class="card-body" style="margin-top: 10px">
                     
-                    <center>
-                    <h3 class="card-text" style="color: gray; padding: 10px; font-size: 20px;">{{pull_request.title}}</h3>
-                      <button id="{{pull_request.id}}" type="button" class="btn btn-danger">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path>
-                              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"></path>
+                      <center>
+                      <h3 class="card-text" style="color: gray; padding: 10px; font-size: 20px;">{{pull_request.title}}</h3>
+                        <button id="{{pull_request.id}}" type="button" class="btn btn-danger">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path>
+                                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"></path>
+                            </svg>
+                        </button>
+  
+                        <button id="{{pull_request.id}}" type="button" class="btn text-white" style="background-color: #FF4500;">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                            <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+                            <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
                           </svg>
+                        </button>
+                        </center>    
+                    </div>
+                  {% else %}
+                    <div class="card-body" style="margin-top: 10px">
+                    
+                      <center>
+                      <h3 class="card-text" style="color: gray; padding: 10px; font-size: 20px;">{{pull_request.title}}</h3>
+                        <button id="{{pull_request.id}}" type="button" class="btn btn-danger">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path>
+                                <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"></path>
+                            </svg>
+                        </button>
+
+                        <button id="{{pull_request.id}}" type="button" class="btn text-white" style="background-color: #FF4500;">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
+                            <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
+                            <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
+                        </svg>
                       </button>
+
+                        <button onclick="merge('{{repository}}', {{pull_request.id}})" id="{{pull_request.id}}" type="button" class="btn text-white" style="background-color: #FF4500;">
+                          <svg xmlns="http://www.w3.org/2000/svg"  width="16" height="16" fill="currentColor" class="bi bi-git" viewBox="0 0 16 16">
+                            <path d="M15.698 7.287 8.712.302a1.03 1.03 0 0 0-1.457 0l-1.45 1.45 1.84 1.84a1.223 1.223 0 0 1 1.55 1.56l1.773 1.774a1.224 1.224 0 0 1 1.267 2.025 1.226 1.226 0 0 1-2.002-1.334L8.58 5.963v4.353a1.226 1.226 0 1 1-1.008-.036V5.887a1.226 1.226 0 0 1-.666-1.608L5.093 2.465l-4.79 4.79a1.03 1.03 0 0 0 0 1.457l6.986 6.986a1.03 1.03 0 0 0 1.457 0l6.953-6.953a1.03 1.03 0 0 0 0-1.457"/>
+                          </svg>
+                        </button>
                       </center>    
-                  </div>
+                    </div>
+                  {% endif %}
+                  
+                 
                 </div>      
             {% endfor %}
         </div>
@@ -220,6 +256,12 @@
 
     <script>
       window.CSRF_TOKEN = "{{ csrf_token }}"
+
+      function merge(repository, pullrequest_id){
+        $.post("/pull-request/"+repository+"/"+pullrequest_id+"/merge/", {csrfmiddlewaretoken: window.CSRF_TOKEN})
+        alert('Pull Request realizado com sucesso!')
+        window.location.href = '/pull-request/'+repository+'/'
+      }
 
       $(".btn-danger:button").click(function() {
         $('#modal').modal('show')

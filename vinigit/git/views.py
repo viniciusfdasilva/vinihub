@@ -37,7 +37,7 @@ class PullRequestMergeView(ListView):
     
     template_name = 'pull_request.html'
     
-    def get(self, request, repository, to_branch, id_pullrequest):
+    def get(self, request, repository, id_pullrequest):
         
         pull_request = PullRequest.objects.get(id=id_pullrequest)
         rep          = Repository.objects.get(name=repository)
@@ -58,7 +58,7 @@ class PullRequestMergeView(ListView):
         
             return render(request, self.template_name, context=context)
         
-    def post(self, request, repository, to_branch, id_pullrequest):
+    def post(self, request, repository, id_pullrequest):
         
         pull_request = PullRequest.objects.get(id=id_pullrequest)
         rep          = Repository.objects.get(name=repository)
@@ -67,7 +67,7 @@ class PullRequestMergeView(ListView):
             
             rep_name = rep.name
             
-            is_successfully = GitManager.git_push(f'/tmp/{rep_name}', to_branch)
+            is_successfully = GitManager.git_push(f'/tmp/{rep_name}', pull_request.to_branch)
             RepositoryManager.remove_dir(f'/tmp/{rep_name}')
             
             pull_request.is_merged = True

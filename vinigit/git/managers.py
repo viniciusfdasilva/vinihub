@@ -59,8 +59,13 @@ class GitManager():
         return [] if len(branches) == 1 and branches[0] == '' else branches
 
     def git_push(git_dir, branch):
+        print(git_dir)
+        if not os.path.exists(f'{git_dir}'):
+            GitManager.git_clone(git_dir.replace('/tmp/',''), '/tmp/')
+        
         
         os.chdir(f'{git_dir}') 
+        os.system(f'git checkout master')
         return True if os.system(f'git push origin {branch}') == 0 else False
         
     def git_clone(rep_name, dst_clone):
