@@ -92,21 +92,41 @@
   </style>
 
   <body class="bg-light">
-     
-    <div>
-
-      <div>
-        <span>Pull Request: </span><strong>{{title}}</strong><br/><br/>
-        <span>Nome do repositório: </span><strong>{{repository}}</strong><br/><br/> 
-        <span>Descrição:</span><br/><textarea>{{description}}</textarea><br/><br/>
-        <span>To: </span><strong>{{to_branch}}</strong><--><span>From: </span><strong>{{from_branch}}</strong>
+    <div class="conteudo">
+      <div class="div">
+        <div style="margin-left: -570px">
+          <a href="/"><img class="d-block mx-auto mb-4" src="{% static 'img/git.png' %}" alt="" width="38" height="38"></a>
+        </div>
       </div>
       
-      {% for message in messages %}                                    
-      {% message.status %}
-        <p style="background-color:#ffc6ad; font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; text-align: center; border-radius: 10px; margin-left: 450px; margin-right: 450px;"><strong>{{message}}</strong></p>                                       
-      {% endfor %}
-    </div>
+      <div class="div">
+        <div style="margin-left: 570px">
+          <a href="/logout"><img class="d-block mx-auto mb-4" src="{% static 'img/user.png' %}" alt="" width="60" height="40"></a>
+        </div>
+      </div>  
+      </div>
+      </div>
+      <div class="container">  
+        <div class="py-2 text-center">
+          
+        </div>
+      </div>
+      
+      <center>
+        <div>
+        
+          <div>
+            <span>Pull Request: </span><strong>{{title}}</strong><br/><br/>
+            <span>Nome do repositório: </span><strong>{{repository}}</strong><br/><br/> 
+            <span>Descrição:</span><br/><textarea style="width:80%; height:100%;" readonly>{{description}}</textarea><br/><br/>
+            <span>From: </span><strong>{{from_branch}}</strong> <h2 style="color: gray;">🠗</h2> <span>To: </span><strong>{{to_branch}}</strong>
+          </div>
+
+          {% for message in messages %}                                    
+            <p style="background-color:#ffc6ad; font-family: Arial, Helvetica, sans-serif; font-size:smaller; color:white; text-align: center; border-radius: 10px; margin-left: 450px; margin-right: 450px;"><strong>{{message}}</strong></p>                                       
+          {% endfor %}
+        </div>
+      </center>
           
     <!-- Bootstrap core JavaScript
     ================================================== -->

@@ -187,8 +187,8 @@
       window.CSRF_TOKEN = "{{ csrf_token }}"
 
       function detail(repository, release_id){
-        $.get('release/'+repository+'/'+release_id+'/')
-        window.location.href = 'release/'+repository+'/'+release_id+'/'
+        $.get('/release/'+repository+'/'+release_id+'/')
+        window.location.href = '/release/'+repository+'/'+release_id+'/'
       }
 
       $(".btn-danger:button").click(function() {
