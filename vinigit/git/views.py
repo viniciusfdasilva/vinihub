@@ -46,11 +46,13 @@ class PullRequestMergeView(ListView):
             form = PullRequestForm()
             
             rep_name = rep.name
+
             pull_requests = PullRequest.objects.filter(repository=rep)
-    
+            
             context = {
                 'pull_requests': pull_requests                    ,
                 'branches'     : GitManager.get_branches(rep_name),
+                'repository'   : repository                       ,
                 'form'         : form                             ,
             }
         
@@ -68,8 +70,12 @@ class PullRequestMergeView(ListView):
             is_successfully = GitManager.git_push(f'/tmp/{rep_name}', to_branch)
             RepositoryManager.remove_dir(f'/tmp/{rep_name}')
             
+            pull_request.is_merged = True
+            pull_request.save()
+
+            
             pull_requests = PullRequest.objects.filter(repository=rep)
-                
+            
             form = PullRequestForm()
             
             if pull_request:
@@ -239,7 +245,7 @@ class PullRequestView(ListView):
                     to_branch   = to_branch       ,
                     description = description     ,
                     title       = title           ,
-                    is_merged   = is_merged_branch,
+                    is_merged   = False           ,
                     repository  = rep             ,        
             )
                             
