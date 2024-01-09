@@ -223,7 +223,7 @@
                             </svg>
                         </button>
 
-                        <button id="{{pull_request.id}}" type="button" class="btn text-white" style="background-color: #FF4500;">
+                        <button onclick="detail('{{repository}}',{{pull_request.id}})" id="{{pull_request.id}}" type="button" class="btn text-white" style="background-color: #FF4500;">
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill" viewBox="0 0 16 16">
                             <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0"/>
                             <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8m8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7"/>
@@ -256,6 +256,11 @@
 
     <script>
       window.CSRF_TOKEN = "{{ csrf_token }}"
+
+      function detail(repository, pullrequest_id){
+        $.get('pull-request/'+repository+'/'+pullrequest_id+'/')
+        window.location.href = 'pull-request/'+repository+'/'+pullrequest_id+'/'
+      }
 
       function merge(repository, pullrequest_id){
         $.post("/pull-request/"+repository+"/"+pullrequest_id+"/merge/", {csrfmiddlewaretoken: window.CSRF_TOKEN})
