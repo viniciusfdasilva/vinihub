@@ -32,12 +32,15 @@ class ReleaseDetailView(ListView):
             }
             
             return render(request, self.template_name, context=context)
+        
+        messages.error(request, 'Repositório ou Release não existe!')
+        return render(request, self.template_name, context={})
 
 class PullRequestMergeView(ListView):
     
     template_name = 'pull_request.html'
     
-    def get(self, request, repository, to_branch, id_pullrequest):
+    def get(self, request, repository, id_pullrequest):
         
         pull_request = PullRequest.objects.get(id=id_pullrequest)
         rep          = Repository.objects.get(name=repository)
@@ -58,7 +61,7 @@ class PullRequestMergeView(ListView):
         
             return render(request, self.template_name, context=context)
         
-    def post(self, request, repository, to_branch, id_pullrequest):
+    def post(self, request, repository, id_pullrequest):
         
         pull_request = PullRequest.objects.get(id=id_pullrequest)
         rep          = Repository.objects.get(name=repository)
@@ -67,7 +70,7 @@ class PullRequestMergeView(ListView):
             
             rep_name = rep.name
             
-            is_successfully = GitManager.git_push(f'/tmp/{rep_name}', to_branch)
+            is_successfully = GitManager.git_push(f'/tmp/{rep_name}', pull_request.to_branch)
             RepositoryManager.remove_dir(f'/tmp/{rep_name}')
             
             pull_request.is_merged = True
@@ -98,18 +101,24 @@ class PullRequestDetailView(ListView):
 
     def get(self, request, repository, id_pullrequest):
           
+        rep          = Repository.objects.get(name=repository)
         pull_request = PullRequest.objects.get(id=id_pullrequest)
         
-        context = {
-            'title'      : pull_request.title,
-            'description': pull_request.description,
-            'is_merged'  : pull_request.is_merged,
-            'repository' : pull_request.repository.name,
-            'to_branch'  : pull_request.to_branch,
-            'from_branch': pull_request.from_branch
-        }
+        if rep and pull_request:
+            
+            context = {
+                'title'      : pull_request.title,
+                'description': pull_request.description,
+                'is_merged'  : pull_request.is_merged,
+                'repository' : pull_request.repository.name,
+                'to_branch'  : pull_request.to_branch,
+                'from_branch': pull_request.from_branch
+            }
+
+            return render(request, self.template_name, context=context)
         
-        return render(request, self.template_name, context=context)
+        messages.error(request, 'Repositório ou Pull Request não existe!')
+        return render(request, self.template_name, context={})
 
 class GitGraphView(ListView):
 
